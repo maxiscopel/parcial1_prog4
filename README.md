@@ -31,11 +31,14 @@ Sistema de gestión de productos con categorías e ingredientes. Permite crear, 
 │       ├── uow/
 │       ├── database.py
 │       └── main.py
+
+
+
 └── frontend/
-└── src/
-├── api/
-├── pages/
-└── types/
+      └── src/
+      ├── api/
+      ├── pages/
+      └── types/
 
 
 link video: https://www.youtube.com/watch?v=7SCEQs3PVH8
