@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
-from app.models.categoria import Categoria
 from app.schemas.categoria_schema import CategoriaCreate, CategoriaRead
 from app.uow.uow import UnitOfWork
+from app.services.categoria_service import CategoriaService
 
 router = APIRouter(prefix="/categorias", tags=["Categorias"])
 
@@ -10,9 +10,18 @@ router = APIRouter(prefix="/categorias", tags=["Categorias"])
 @router.post("/", response_model=CategoriaRead, status_code=201)
 def crear_categoria(datos: CategoriaCreate):
     with UnitOfWork() as uow:
-        categoria = uow.categorias.crear(Categoria(nombre=datos.nombre))
+        service = CategoriaService(uow)
+        categoria = service.crear(datos)
         uow.commit()
-        return CategoriaRead(id=categoria.id, nombre=categoria.nombre)
+        return CategoriaRead(
+            id=categoria.id,
+            nombre=categoria.nombre,
+            descripcion=categoria.descripcion,
+            imagen_url=categoria.imagen_url,
+            parent_id=categoria.parent_id,
+            created_at=categoria.created_at,
+            updated_at=categoria.updated_at,
+        )
 
 
 @router.get("/", response_model=List[CategoriaRead])
@@ -22,13 +31,15 @@ def listar_categorias(
     offset: int = 0
 ):
     with UnitOfWork() as uow:
-        return uow.categorias.listar(nombre=nombre, limit=limit, offset=offset)
+        service = CategoriaService(uow)
+        return service.listar(nombre=nombre, limit=limit, offset=offset)
 
 
 @router.get("/{categoria_id}", response_model=CategoriaRead)
 def obtener_categoria(categoria_id: int):
     with UnitOfWork() as uow:
-        categoria = uow.categorias.obtener_por_id(categoria_id)
+        service = CategoriaService(uow)
+        categoria = service.obtener_por_id(categoria_id)
         if not categoria:
             raise HTTPException(status_code=404, detail="Categoria no encontrada")
         return categoria
@@ -37,20 +48,29 @@ def obtener_categoria(categoria_id: int):
 @router.put("/{categoria_id}", response_model=CategoriaRead)
 def actualizar_categoria(categoria_id: int, datos: CategoriaCreate):
     with UnitOfWork() as uow:
-        categoria = uow.categorias.obtener_por_id(categoria_id)
+        service = CategoriaService(uow)
+        categoria = service.obtener_por_id(categoria_id)
         if not categoria:
             raise HTTPException(status_code=404, detail="Categoria no encontrada")
-        categoria.nombre = datos.nombre
+        categoria = service.actualizar(categoria, datos)
         uow.commit()
-        return CategoriaRead(id=categoria.id, nombre=categoria.nombre)
+        return CategoriaRead(
+            id=categoria.id,
+            nombre=categoria.nombre,
+            descripcion=categoria.descripcion,
+            imagen_url=categoria.imagen_url,
+            parent_id=categoria.parent_id,
+            created_at=categoria.created_at,
+            updated_at=categoria.updated_at,
+        )
 
 
 @router.delete("/{categoria_id}", status_code=204)
 def eliminar_categoria(categoria_id: int):
     with UnitOfWork() as uow:
-        categoria = uow.categorias.obtener_por_id(categoria_id)
+        service = CategoriaService(uow)
+        categoria = service.obtener_por_id(categoria_id)
         if not categoria:
             raise HTTPException(status_code=404, detail="Categoria no encontrada")
-        uow.categorias.eliminar_relaciones(categoria_id)
-        uow.categorias.eliminar(categoria)
+        service.eliminar(categoria)
         uow.commit()

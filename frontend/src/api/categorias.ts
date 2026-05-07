@@ -1,5 +1,5 @@
 import api from './index'
-import type { Categoria, CategoriaCreate } from '../types'
+import type { Categoria, CategoriaCreate } from '../types/categoria'
 
 export const getCategorias = () => api.get<Categoria[]>('/categorias/').then(r => r.data)
 export const getCategoria = (id: number) => api.get<Categoria>(`/categorias/${id}`).then(r => r.data)

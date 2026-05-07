@@ -1,9 +1,12 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
+from datetime import datetime
 
 class ProductoCategoria(SQLModel, table=True):
     producto_id: Optional[int] = Field(default=None, foreign_key="producto.id", primary_key=True)
     categoria_id: Optional[int] = Field(default=None, foreign_key="categoria.id", primary_key=True)
+    es_principal: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
     producto: Optional["Producto"] = Relationship(back_populates="categorias")
     categoria: Optional["Categoria"] = Relationship(back_populates="productos")

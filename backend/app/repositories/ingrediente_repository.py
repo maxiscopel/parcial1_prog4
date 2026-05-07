@@ -14,7 +14,7 @@ class IngredienteRepository:
         self.session.refresh(ingrediente)
         return ingrediente
 
-    def listar(self, nombre: Optional[str] = None, limit: int = 10, offset: int = 0) -> List[Ingrediente]:
+    def listar(self, nombre: Optional[str] = None, limit: int = 100, offset: int = 0) -> List[Ingrediente]:
         query = select(Ingrediente)
         if nombre:
             query = query.where(Ingrediente.nombre.contains(nombre))

@@ -1,5 +1,5 @@
 import api from './index'
-import type { Ingrediente, IngredienteCreate } from '../types'
+import type { Ingrediente, IngredienteCreate } from '../types/ingrediente'
 
 export const getIngredientes = () => api.get<Ingrediente[]>('/ingredientes/').then(r => r.data)
 export const getIngrediente = (id: number) => api.get<Ingrediente>(`/ingredientes/${id}`).then(r => r.data)

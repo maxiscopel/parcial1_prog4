@@ -1,5 +1,5 @@
 import api from './index'
-import type { Producto, ProductoCreate, ProductoDetalle } from '../types'
+import type { Producto, ProductoCreate, ProductoDetalle } from '../types/producto'
 
 export const getProductos = () => api.get<Producto[]>('/productos/').then(r => r.data)
 export const getProducto = (id: number) => api.get<ProductoDetalle>(`/productos/${id}`).then(r => r.data)

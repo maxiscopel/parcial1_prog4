@@ -17,16 +17,23 @@ class ProductoRepository:
         self.session.refresh(producto)
         return producto
 
-    def listar(self, nombre: Optional[str] = None, precio_max: Optional[float] = None, limit: int = 10, offset: int = 0) -> List[Producto]:
+    def listar(self, nombre: Optional[str] = None, precio_max: Optional[float] = None, solo_activos: bool = True, limit: int = 100, offset: int = 0) -> List[Producto]:
         query = select(Producto)
+        if solo_activos:
+            query = query.where(Producto.deleted_at == None)
         if nombre:
             query = query.where(Producto.nombre.contains(nombre))
         if precio_max:
-            query = query.where(Producto.precio <= precio_max)
+            query = query.where(Producto.precio_base <= precio_max)
         return self.session.exec(query.offset(offset).limit(limit)).all()
 
     def obtener_por_id(self, producto_id: int) -> Optional[Producto]:
-        return self.session.get(Producto, producto_id)
+        return self.session.exec(
+            select(Producto).where(
+                Producto.id == producto_id,
+                Producto.deleted_at == None
+            )
+        ).first()
 
     def obtener_categorias(self, producto_id: int) -> List[Categoria]:
         return self.session.exec(

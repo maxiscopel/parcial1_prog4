@@ -14,14 +14,21 @@ class CategoriaRepository:
         self.session.refresh(categoria)
         return categoria
 
-    def listar(self, nombre: Optional[str] = None, limit: int = 10, offset: int = 0) -> List[Categoria]:
+    def listar(self, nombre: Optional[str] = None, solo_activas: bool = True, limit: int = 100, offset: int = 0) -> List[Categoria]:
         query = select(Categoria)
+        if solo_activas:
+            query = query.where(Categoria.deleted_at == None)
         if nombre:
             query = query.where(Categoria.nombre.contains(nombre))
         return self.session.exec(query.offset(offset).limit(limit)).all()
 
     def obtener_por_id(self, categoria_id: int) -> Optional[Categoria]:
-        return self.session.get(Categoria, categoria_id)
+        return self.session.exec(
+            select(Categoria).where(
+                Categoria.id == categoria_id,
+                Categoria.deleted_at == None
+            )
+        ).first()
 
     def eliminar_relaciones(self, categoria_id: int):
         rels = self.session.exec(

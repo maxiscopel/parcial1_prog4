@@ -26,8 +26,17 @@ export default function ProductoDetalle() {
 
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-4">{producto.nombre}</h1>
-        <p className="mb-3 text-lg">
-          <span className="font-semibold">Precio:</span> ${producto.precio}
+        {producto.descripcion && (
+          <p className="text-gray-500 mb-3">{producto.descripcion}</p>
+        )}
+        <p className="mb-2 text-lg">
+          <span className="font-semibold">Precio:</span> ${producto.precio_base.toLocaleString()}
+        </p>
+        <p className="mb-3">
+          <span className="font-semibold">Stock:</span> {producto.stock_cantidad} unidades —{' '}
+          {producto.disponible
+            ? <span className="text-green-600 font-medium">Disponible</span>
+            : <span className="text-red-500 font-medium">No disponible</span>}
         </p>
         <div className="mb-3">
           <p className="font-semibold mb-1">Categorías:</p>
@@ -48,8 +57,8 @@ export default function ProductoDetalle() {
           {producto.ingredientes.length > 0 ? (
             <div className="flex gap-2 flex-wrap">
               {producto.ingredientes.map(i => (
-                <span key={i.id} className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                  {i.nombre}
+                <span key={i.id} className={`px-3 py-1 rounded-full text-sm ${i.es_alergeno ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                  {i.nombre}{i.es_alergeno ? ' ⚠️' : ''}
                 </span>
               ))}
             </div>
